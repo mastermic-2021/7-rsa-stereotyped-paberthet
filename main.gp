@@ -30,3 +30,40 @@ change_password(user,modulus,e=7) = {
     print("[OK] changed password for user ",user);
   ,E,print("[ERROR] ",E));
 }
+
+\\=====================================
+\\        Attaque de Coppersmith
+\\=====================================
+
+\\on connait ici une partie du clair. On a le schéma suivant :
+\\onconnaitceciXXXXXXXetcela
+\\=
+\\onconnaitceci0000000etcela
+\\ +           XXXXXXX000000
+\\On veut donc trouver la solution du système suivant :
+\\ (X + connu ) ^e = chiffre modulo n
+\\ on va s'appuyer sur la fonction de PARIGP zncoppersmith
+\\L'attaque de Coppersmith est efficace sur le petit exposant de déchiffrement.
+\\Son principe d'attaque est basé sur le fait suivant :
+\\si on fixe la borne supérieure des racines étudiées du polynome à n^(1/d-eps), pour eps petit,
+\\ on peut trouver les racines du polynome inférieures à X.
+\\ Il s'agit du théoreme de Coppersmith.
+\\a noter, pour l'usage de zncoppersmith de PARI GP,
+\\ qu'il est important de multiplier x par un coefficient en cas de décalage,
+\\ ce qui est ici le cas
+
+\\==============================
+
+encode(m) = fromdigits(Vec(Vecsmall(m)),128);
+decode(c) = {Strchr(digits(c,128));};
+
+text = readvec("input.txt");
+cach = text[2];
+n = text[1][1];
+e = text[1][2];
+message = Strprintf(template,"          ");
+limit = 128^10;
+chiffr = encode(message);
+print(chiffr);
+dechiffr = zncoppersmith((chiffr + 128^56*x)^e - cach,n,limit);
+print(Strprintf(template,decode(dechiffr[1])));
