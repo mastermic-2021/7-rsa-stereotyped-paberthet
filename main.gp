@@ -61,9 +61,11 @@ text = readvec("input.txt");
 cach = text[2];
 n = text[1][1];
 e = text[1][2];
-message = Strprintf(template,"          ");
+\\message = Strprintf(template,decode(Vec(0,10))); ici on a qlq problemes avec le symbole NULL, on n'aura donc pas recours au template ici
 limit = 128^10;
-chiffr = encode(message);
-print(chiffr);
+m1=Vec(Vecsmall("Cher collaborateur, votre nouveau mot de passe est "));
+m2=Vec(Vecsmall(". Merci de votre comprehension, le service informatique."));
+message = concat(concat(m1,Vec(0,10)),m2);
+chiffr = fromdigits(Vec(message),128);
 dechiffr = zncoppersmith((chiffr + 128^56*x)^e - cach,n,limit);
 print(Strprintf(template,decode(dechiffr[1])));
